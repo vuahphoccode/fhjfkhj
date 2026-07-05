@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Bếp ăn Mầm non</title>
+    <!-- Tích hợp Bootstrap 5 giúp giao diện đẹp và hiện đại nhanh chóng -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tích hợp FontAwesome để dùng các icon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { background-color: #2c3e50; min-height: 100vh; color: white; }
+        .sidebar .nav-link { color: #ecf0f1; border-radius: 5px; margin-bottom: 5px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #34495e; color: #3498db; }
+        .card-counter { border-left: 5px solid; }
+        .meal-title { background-color: #e9ecef; font-weight: bold; padding: 5px 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- REGION: THANH MENU BÊN TRÁI (SIDEBAR) -->
+        <div class="col-md-3 col-lg-2 sidebar p-3 d-flex flex-column">
+            <h5 class="text-center py-3 text-warning"><i class="fa-solid fa-cookie-bite me-2"></i>Bếp Ăn Mầm Non</h5>
+            <hr>
+            
+            <!-- Giả lập bộ chuyển đổi Vai trò (Sau này sẽ dựa vào Login) -->
+            <div class="mb-4">
+                <label class="form-label text-muted small">Xem giao diện theo vai trò:</label>
+                <select class="form-select form-select-sm" id="roleSwitcher" onchange="switchRoleView()">
+                    <option value="manager">Người Quản Lý</option>
+                    <option value="teacher">Giáo Viên</option>
+                    <option value="kitchen">Nhân Viên Bếp</option>
+                    <option value="parent">Phụ Huynh</option>
+                </select>
+            </div>
+
+            <ul class="nav flex-column mb-auto">
+                <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-solid fa-chart-pie me-2"></i>Tổng quan</a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-calendar-days me-2"></i>Lên Thực Đơn</a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-user-check me-2"></i>Báo Nghỉ / Điểm Danh</a></li>
+                <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-warehouse me-2"></i>Kho Nguyên Liệu</a></li>
+            </ul>
+            <hr>
+            <div class="small text-muted text-center">Hệ thống phiên bản 2026</div>
+        </div>
+
+        <!-- REGION: NỘI DUNG CHÍNH (MAIN CONTENT) -->
+        <div class="col-md-9 col-lg-10 p-4">
+            
+            <!-- Header thông tin góc trên -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Hệ Thống Quản Lý Suất Ăn</h2>
+                <div class="text-end">
+                    <span class="badge bg-secondary p-2"><i class="fa-solid fa-clock me-1"></i> Hạn báo nghỉ: 07:00 AM hàng ngày</span>
+                </div>
+            </div>
+
+            <!-- 1. KHU VỰC THỐNG KÊ (KPI CARDS) -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card p-3 card-counter shadow-sm" style="border-left-color: #2ecc71;">
+                        <span class="text-muted small uppercase">Trẻ đi học thực tế</span>
+                        <h3 class="fw-bold text-success">320 / 350</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card p-3 card-counter shadow-sm" style="border-left-color: #e67e22;">
+                        <span class="text-muted small">Suất ăn Nhà Trẻ cần nấu</span>
+                        <h3 class="fw-bold text-warning">110 suất</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card p-3 card-counter shadow-sm" style="border-left-color: #3498db;">
+                        <span class="text-muted small">Suất ăn Mẫu Giáo cần nấu</span>
+                        <h3 class="fw-bold text-primary">210 suất</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card p-3 card-counter shadow-sm" style="border-left-color: #e74c3c;">
+                        <span class="text-muted small">Báo nghỉ muộn (Vẫn tính tiền)</span>
+                        <h3 class="fw-bold text-danger">5 trẻ</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. PHÂN HỆ CHỨC NĂNG CHÍNH (THAY ĐỔI THEO VAI TRÒ) -->
+            <div class="row">
+                
+                <!-- BÊN TRÁI: GIAO DIỆN QUẢN LÝ / XEM THỰC ĐƠN -->
+                <div class="col-lg-7 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <h5 class="mb-0 text-primary"><i class="fa-solid fa-utensils me-2"></i>Thực Đơn Dự Kiến Trong Tuần</h5>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary active">Khối Nhà Trẻ</button>
+                                <button class="btn btn-outline-primary">Khối Mẫu Giáo</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Bộ lọc Thứ trong tuần -->
+                            <ul class="nav nav-pills mb-3 justify-content-center" id="pills-tab" role="tablist">
+                                <li class="nav-item"><button class="nav-link active small py-1" data-bs-toggle="pill">Thứ 2</button></li>
+                                <li class="nav-item"><button class="nav-link small py-1" data-bs-toggle="pill">Thứ 3</button></li>
+                                <li class="nav-item"><button class="nav-link small py-1" data-bs-toggle="pill">Thứ 4</button></li>
+                                <li class="nav-item"><button class="nav-link small py-1" data-bs-toggle="pill">Thứ 5</button></li>
+                                <li class="nav-item"><button class="nav-link small py-1" data-bs-toggle="pill">Thứ 6</button></li>
+                            </ul>
+                            
+                            <!-- Chi tiết món ăn -->
+                            <div class="mt-3">
+                                <div class="mb-2">
+                                    <div class="meal-title text-success"><i class="fa-solid fa-sun me-1"></i> Bữa Sáng (07:30)</div>
+                                    <p class="ps-3 pt-1 text-secondary mb-1">Cháo thịt băm cá hồi, Sữa tươi tiệt trùng.</p>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="meal-title text-danger"><i class="fa-solid fa-bowl-food me-1"></i> Bữa Trưa (10:30)</div>
+                                    <p class="ps-3 pt-1 text-secondary mb-1">Cơm nát, Canh bí đỏ thịt bằm, Thịt sốt cà chua, Chuối chín.</p>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="meal-title text-warning"><i class="fa-solid fa-cloud-sun me-1"></i> Bữa Xế (14:00)</div>
+                                    <p class="ps-3 pt-1 text-secondary mb-1">Phở gà xé phay, Nước cam nguyên chất.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Nút hành động dành riêng cho Quản lý (Ẩn hiện linh hoạt ở back-end) -->
+                            <div class="text-end mt-4">
+                                <button class="btn btn-sm btn-outline-success"><i class="fa-solid fa-plus me-1"></i>Chỉnh sửa / Thêm món</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BÊN PHẢI: GIAO DIỆN PHỤ HUYNH / GIÁO VIÊN BÁO NGHỈ -->
+                <div class="col-lg-5 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0 text-danger"><i class="fa-solid fa-bell me-2"></i>Góc Tương Tác Tức Thì</h5>
+                        </div>
+                        <div class="card-body">
+                            
+                            <!-- Hộp chức năng Phụ huynh báo nghỉ nhanh -->
+                            <div class="p-3 border rounded mb-3 bg-light">
+                                <h6 class="fw-bold text-dark"><i class="fa-solid fa-user-shield me-2 text-primary"></i>Khu vực của Phụ Huynh</h6>
+                                <p class="small text-muted mb-2">Báo nghỉ học cho con hôm nay:</p>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-danger w-100" onclick="alert('Đã ghi nhận báo nghỉ trước 7h sáng. Suất ăn hôm nay KHÔNG tính tiền.')">
+                                        <i class="fa-solid fa-user-minus me-1"></i>Báo Nghỉ Hôm Nay
+                                    </button>
+                                </div>
+                                <div class="mt-2 small text-muted"><i class="fa-solid fa-circle-info me-1"></i>Hệ thống tự động ghi nhận giờ gửi yêu cầu.</div>
+                            </div>
+
+                            <!-- Hộp chức năng Giáo viên kiểm tra nhanh lớp học -->
+                            <div class="p-3 border rounded bg-light">
+                                <h6 class="fw-bold text-dark"><i class="fa-solid fa-chalkboard-user me-2 text-success"></i>Khu vực của Giáo Viên</h6>
+                                <p class="small text-muted mb-2">Cập nhật nhanh sĩ số lớp hôm nay (Lớp Thỏ Ngọc):</p>
+                                <table class="table table-sm table-bordered bg-white text-center small">
+                                    <thead>
+                                        <tr>
+                                            <th>Tên Học Sinh</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Nguyễn Minh Anh</td>
+                                            <td><span class="badge bg-success">Có mặt</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Trần Bảo Gia Bảo</td>
+                                            <td><span class="badge bg-danger">Vắng (Báo muộn)</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- 3. BẢNG TỰ ĐỘNG ĐỊNH LƯỢNG NGUYÊN LIỆU (DÀNH CHO BẾP) -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0 text-dark"><i class="fa-solid fa-basket-shopping me-2 text-warning"></i>Bảng Dự Toán Nguyên Liệu Cho Đầu Bếp (Tự động theo sĩ số thực tế)</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Tên Nguyên Liệu</th>
+                                        <th>Định lượng / 1 Trẻ</th>
+                                        <th>Tổng số trẻ hôm nay</th>
+                                        <th>Tổng khối lượng cần mua</th>
+                                        <th>Trạng thái kho</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Thịt nạc heo</strong></td>
+                                        <td>50 gam</td>
+                                        <td>320 trẻ</td>
+                                        <td><span class="badge bg-info text-dark fs-6">16.0 kg</span></td>
+                                        <td><span class="text-success"><i class="fa-solid fa-check-circle me-1"></i>Đủ hàng</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cá hồi tươi</strong></td>
+                                        <td>30 gam</td>
+                                        <td>320 trẻ</td>
+                                        <td><span class="badge bg-info text-dark fs-6">9.6 kg</span></td>
+                                        <td><span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-1"></i>Thiếu 3kg (Cần mua)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Bí đỏ</strong></td>
+                                        <td>40 gam</td>
+                                        <td>320 trẻ</td>
+                                        <td><span class="badge bg-info text-dark fs-6">12.8 kg</span></td>
+                                        <td><span class="text-success"><i class="fa-solid fa-check-circle me-1"></i>Đủ hàng</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Thư viện Javascript của Bootstrap để hỗ trợ các hiệu ứng Tab, Dropdown -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Hàm giả lập thay đổi quyền truy cập để bạn kiểm tra giao diện trực quan ngay trên NetBeans
+    function switchRoleView() {
+        var selectedRole = document.getElementById("roleSwitcher").value;
+        alert("Bạn vừa giả lập chuyển sang vai trò: " + selectedRole.toUpperCase() + ".\nỞ phần Back-end sau này, các nút bấm và dữ liệu không thuộc quyền hạn sẽ tự động ẩn đi.");
+    }
+</script>
+</body>
+</html>
